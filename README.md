@@ -26,3 +26,8 @@ Ein grausamer Mord erschüttert die abgelegene Villa, in der du dich nun wiederf
 Du bist Travis. Dein Instinkt sagt dir, dass hier etwas nicht stimmt. Jedes Geräusch, jeder Schatten könnte dein Ende bedeuten. Wirst du das Rätsel lösen – oder wird der Mörder dich zum Schweigen bringen?
 
 Viel Glück, Detective. Du wirst es brauchen.
+
+
+**Team**
+- Langeder David
+- Dollhäubl Arian
