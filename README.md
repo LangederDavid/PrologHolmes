@@ -23,8 +23,9 @@ Ein grausamer Mord erschüttert die abgelegene Villa, in der du dich nun wiederf
 
 
 ## Überlebe die Nacht...
-Du bist Travis. Dein Instinkt sagt dir, dass hier etwas nicht stimmt. Jedes Geräusch, jeder Schatten könnte dein Ende bedeuten. Wirst du das Rätsel lösen – oder wird der Mörder dich zum Schweigen bringen?
+Du bist Detektiv Travis. Dein Instinkt sagt dir, dass hier etwas nicht stimmt. Jedes Geräusch, jeder Schatten könnte dein Ende bedeuten. Wirst du das Rätsel lösen – oder wird der Mörder dich zum Schweigen bringen?
 
+Du bekommst einen anonymen Anruf mit verzerrter Stimme, eine Leiche wurde in der Villa gefunden. Laut den Überwachungskameras rund ums Haus hat keiner die Villa verlassen und keine Person hat sie betreten. Der Tote wurde also von einem Bewohner der Villa mit einem Küchenmesser ermordet. Du verhöhrst jeden einzelnen Bewohner und machst dir dein eigenes Bild. Begib dich aber nicht in gefährliche Situationen, denn jeder könnte der Mörder sein!
 Viel Glück, Detective. Du wirst es brauchen.
 
 
