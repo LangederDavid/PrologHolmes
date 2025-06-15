@@ -1,23 +1,18 @@
 % === DYNAMISCHE FAKTEN ===
 
 :- dynamic(player/2).
-:- dynamic(suspect/2).
-:- dynamic(item/2).
 :- dynamic(inventory/1).
+:- dynamic(clue_found/1).
+:- dynamic(game_over/0).
 
-% === ORTE UND WEGE ===
-
-location('Wohnzimmer', 'Ein gemütlicher Raum mit einem alten Kamin.').
-location('Küche', 'Die Küche riecht nach frischen Gewürzen, doch ein Messer fehlt.').
-location('Garten', 'Draußen ist es düster. Ein kalter Wind weht durch die Nacht.').
-
-path('Wohnzimmer', 'Osten', 'Küche').
-path('Küche', 'Westen', 'Wohnzimmer').
-path('Wohnzimmer', 'Süden', 'Garten').
+% Include all other modules
+:- include('locations.pl').
+:- include('characters.pl').
+:- include('items.pl').
 
 % === SPIELER ===
 
-player(travis, 'Wohnzimmer').
+player(travis, 'Eingangshalle').
 
 setLocation(NewLocation) :-
     retract(player(travis, _)),
@@ -26,107 +21,194 @@ setLocation(NewLocation) :-
 % === SPIELSTART ===
 
 start :-
+    retractall(clue_found(_)),
+    retractall(game_over),
+    retractall(inventory(_)),
+    setLocation('Eingangshalle'),
     write('*Ring Ring*'), nl, nl,
     write('Eine verzerrte Stimme am Telefon:'), nl,
-    write('''Eine Leiche wurde in der Villa gefunden... Niemand kam rein, niemand ging raus.'''), nl,
-    write('''Der Mörder ist noch im Haus, Detektiv. Finden Sie ihn... bevor er SIE findet.'''), nl, nl,
-    write('Willkommen zu PrologHolmes'), nl,
+    write('"Eine Leiche wurde in der Villa gefunden... Niemand kam rein, niemand ging raus."'), nl,
+    write('"Der Moerder ist noch im Haus, Detektiv. Finden Sie ihn... bevor er SIE findet."'), nl, nl,
+    write('*** PROLOGHOLMES - DER FALL STEINFELD ***'), nl,
     write('Du bist Travis, ein erfahrener Detektiv.'), nl,
-    write('Ein Mord wurde begangen – und der Täter ist noch unter den Bewohnern der Villa.'), nl,
-    write('Verhöre die Verdächtigen, finde Hinweise, und überlebe die Nacht!'), nl, nl,
+    write('Baron von Steinfeld wurde in seiner Villa erstochen aufgefunden.'), nl,
+    write('Alle Verdaechtigen sind noch im Haus - einer von ihnen ist der Moerder!'), nl,
+    write('Sammle Hinweise, verhoere die Verdaechtigen und finde den wahren Taeter.'), nl,
+    write('WARNUNG: Wenn du den falschen beschuldigst, verlierst du!'), nl, nl,
     show_help,
     look.
 
 % === HILFE ===
 
 show_help :-
-    write('Verfügbare Befehle:'), nl,
+    write('*** VERFUEGBARE BEFEHLE ***'), nl,
     write('start.              -- Spiel starten'), nl,
-    write('n. s. e. w.         -- Nach Norden, Süden, Osten, Westen gehen'), nl,
     write('look.               -- Umgebung ansehen'), nl,
-    write('interrogate(Name).  -- Eine Person verhören (z. B. interrogate(''Oma Gerti'').)'), nl,
+    write('n. s. e. w.         -- Nach Norden, Sueden, Osten, Westen gehen'), nl,
+    write('unten. oben.        -- Nach unten/oben gehen'), nl,
+    write('interrogate(Name).  -- Eine Person verhoeren'), nl,
+    write('examine(Objekt).    -- Einen Gegenstand untersuchen'), nl,
     write('take(Objekt).       -- Einen Gegenstand aufnehmen'), nl,
-    write('drop(Objekt).       -- Einen Gegenstand ablegen'), nl,
-    write('inventory.          -- Zeigt dein Inventar'), nl,
-    write('accuse(Name).       -- Einen Verdächtigen beschuldigen'), nl,
+    write('inventory.          -- Inventar anzeigen'), nl,
+    write('clues.              -- Gefundene Hinweise anzeigen'), nl,
+    write('accuse(Name).       -- Jemanden des Mordes beschuldigen'), nl,
+    write('hint.               -- Kleiner Tipp'), nl,
     write('halt.               -- Spiel beenden'), nl, nl.
 
 % === BEWEGUNG ===
 
 n :- move('Norden').
-s :- move('Süden').
+s :- move('Sueden').
 e :- move('Osten').
 w :- move('Westen').
+unten :- move('Unten').
+oben :- move('Oben').
 
+move(Direction) :-
+    game_over,
+    write('Das Spiel ist beendet! Starte mit start. neu.'), nl, !.
 move(Direction) :-
     player(travis, Location),
     path(Location, Direction, NewLocation),
     setLocation(NewLocation),
-    look.
+    look,
+    !.
 move(_) :-
     write('Dorthin kannst du nicht gehen.'), nl.
 
 % === UMGEBUNG ===
 
 look :-
+    game_over,
+    write('Das Spiel ist beendet! Starte mit start. neu.'), nl, !.
+look :-
     player(travis, Location),
     location(Location, Description),
-    write('Du bist in '), write(Location), write('. '), write(Description), nl,
-    findall(S, (suspect(S, _), player(travis, Location)), Suspects),
+    format('*** ~w ***~n', [Location]),
+    format('~w~n~n', [Description]),
+    
+    % Zeige Verdaechtige
+    findall(S, suspect_location(S, Location), Suspects),
     ( Suspects \= [] ->
-        write('Personen hier: '), write(Suspects), nl
+        write('PERSONEN HIER: '),
+        print_list(Suspects)
     ; true ),
-    findall(I, item(I, Location), Items),
+    
+    % Zeige Gegenstaende
+    findall(I, item_location(I, Location), Items),
     ( Items \= [] ->
-        write('Gegenstände hier: '), write(Items), nl
+        write('GEGENSTAENDE HIER: '),
+        print_list(Items)
     ; true ).
 
-% === VERDÄCHTIGE ===
+print_list([]).
+print_list([H]) :- 
+    format('~w~n', [H]).
+print_list([H|T]) :- 
+    format('~w, ', [H]),
+    print_list(T).
 
-suspect('Oma Gerti', 'Sitzt vorm Fernseher, doch scheint nervös zu sein.').
-suspect('Onkel Olaf', 'Wirkt besorgt, aber kooperativ.').
-suspect('Kayla', 'Hat Tränen in den Augen, schweigt jedoch.').
-suspect('Hauskoch Josef', 'Vermeidet Blickkontakt, schwitzt stark.').
-
-interrogate(Name) :-
-    suspect(Name, Aussage),
-    write(Name), write(' sagt: '''), write(Aussage), write(''''), nl.
-interrogate(_) :-
-    write('Diese Person ist nicht verdächtig oder nicht in deiner Nähe.'), nl.
-
-% === GEGENSTÄNDE ===
-
-item('Blutiges Messer', 'Küche').
+% === INVENTAR ===
 
 take(Item) :-
+    game_over,
+    write('Das Spiel ist beendet! Starte mit start. neu.'), nl, !.
+take(Item) :-
     player(travis, Location),
-    item(Item, Location),
+    item_location(Item, Location),
+    retract(item_location(Item, Location)),
     assertz(inventory(Item)),
-    retract(item(Item, Location)),
-    write('Du hast '), write(Item), write(' aufgenommen.'), nl.
+    format('Du hast ~w aufgenommen.~n', [Item]),
+    !.
 take(_) :-
     write('Dieses Objekt ist nicht hier.'), nl.
-
-drop(Item) :-
-    inventory(Item),
-    player(travis, Location),
-    retract(inventory(Item)),
-    assertz(item(Item, Location)),
-    write('Du hast '), write(Item), write(' abgelegt.'), nl.
-drop(_) :-
-    write('Du hast diesen Gegenstand nicht.'), nl.
 
 inventory :-
     findall(I, inventory(I), Items),
     ( Items = [] ->
         write('Dein Inventar ist leer.'), nl
-    ; write('Du trägst: '), write(Items), nl
+    ; 
+        write('DU TRAEGST: '),
+        print_list(Items)
     ).
 
-% === BESCHULDIGUNG ===
+% === HINWEISE SYSTEM ===
 
-accuse(Name) :-
-    suspect(Name, _),
-    write('Du beschuldigst '), write(Name), write('. Doch war es wirklich der Täter...?'), nl.
+clues :-
+    findall(C, clue_found(C), FoundClues),
+    ( FoundClues = [] ->
+        write('Du hast noch keine Hinweise gefunden.'), nl
+    ; 
+        write('*** GEFUNDENE HINWEISE ***'), nl,
+        show_clue_details(FoundClues)
+    ).
+
+show_clue_details([]).
+show_clue_details([H|T]) :-
+    clue_description(H, Desc),
+    format('- ~w~n', [Desc]),
+    show_clue_details(T).
+
+clue_description(gerti_testament, 'Testament wurde heute geaendert').
+clue_description(olaf_alibi, 'Olafs Alibi ist fragwuerdig - saubere Schuhe').
+clue_description(kayla_erbschaft, 'Kayla wuerde ohne Heirat nichts erben').
+clue_description(josef_messer, 'Mordwaffe stammt aus Josefs Kueche').
+clue_description(weber_gift, 'Dr. Weber hatte Zugang zu Giften').
+clue_description(mueller_testament, 'Neues Testament hat unerwarteten Erben').
+clue_description(testament_erbe, 'Kayla wurde als Alleinerbin gestrichen').
+clue_description(zyankali_gift, 'Zyankali gefunden, aber Baron wurde erstochen').
+clue_description(erpressung, 'Erpressungsbrief mit weiblicher Handschrift').
+clue_description(handschuhe_beweis, 'Blutige Handschuhe gehoeren einer Frau').
+clue_description(kellerschluessel, 'Schluessel fuer Kellertruhe gefunden').
+
+% === BESCHULDIGUNG UND SPIELENDE ===
+
+accuse(Murderer) :-
+    game_over,
+    write('Das Spiel ist beendet! Starte mit start. neu.'), nl, !.
+accuse('Kayla') :-
+    % Kayla ist die Taeterin!
+    assertz(game_over),
+    nl,
+    write('*** HERZLICHEN GLUECKWUNSCH! ***'), nl,
+    write('Du hast den Fall geloest!'), nl, nl,
+    write('DIE LOESUNG:'), nl,
+    write('Kayla war die Taeterin! Als der Baron sein Testament aenderte und'), nl,
+    write('sie als Alleinerbin strich, wurde sie wahnsinnig vor Wut.'), nl,
+    write('Sie nahm das Messer aus der Kueche, erstach den Baron und'), nl,
+    write('versuchte die Tat zu vertuschen. Die blutigen Handschuhe'), nl,
+    write('in der Garage und der Erpressungsbrief waren ihre Spuren.'), nl,
+    write('Der Arzt Dr. Weber sollte nur abgelenkt werden mit dem Gift.'), nl, nl,
+    write('*** FALL ABGESCHLOSSEN ***'), nl,
+    !.
+accuse(Suspect) :-
+    suspect(Suspect, _),
+    assertz(game_over),
+    nl,
+    write('*** GAME OVER ***'), nl,
+    format('Du hast ~w beschuldigt, aber das war falsch!~n', [Suspect]),
+    write('Kayla war die wahre Taeterin. Sie hoerte deine falsche'), nl,
+    write('Beschuldigung und konnte unbemerkt entkommen!'), nl,
+    write('Der Fall bleibt ungeloest...'), nl, nl,
+    write('Starte mit start. neu, um es nochmal zu versuchen.'), nl,
+    !.
 accuse(_) :-
-    write('Diese Person kennst du nicht.'), nl.
+    write('Diese Person ist nicht verdaechtig.'), nl.
+
+% === TIPP SYSTEM ===
+
+hint :-
+    game_over,
+    write('Das Spiel ist beendet! Starte mit start. neu.'), nl, !.
+hint :-
+    findall(C, clue_found(C), Clues),
+    length(Clues, NumClues),
+    ( NumClues < 3 ->
+        write('TIPP: Untersuche mehr Gegenstaende und verhoere alle Verdaechtigen!')
+    ; NumClues < 6 ->
+        write('TIPP: Achte auf die Handschuhe und das Testament - wer profitiert vom Tod?')
+    ; NumClues < 9 ->
+        write('TIPP: Eine Frau hat kleine Haende... und ein Motiv!')
+    ; 
+        write('TIPP: Du hast genug Hinweise! Wer wurde vom Testament gestrichen?')
+    ), nl.
