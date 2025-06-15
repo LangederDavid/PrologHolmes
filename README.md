@@ -1,32 +1,70 @@
-# PrologHolmes
+# PrologHolmes - Der Fall Steinfeld
 
-## Ein düsteres Textadventure mit tödlichem Ausgang
+Willkommen zu *PrologHolmes*, einem interaktiven Kriminal-Textadventure in Prolog, das dich in die Rolle des erfahrenen Detektivs Travis versetzt.
 
-Willkommen zu *PrologHolmes*, einem interaktiven Textadventure, das dich in die Rolle des hartgesottenen Detektivs Travis versetzt.
+Baron von Steinfeld wurde in seiner Villa brutal ermordet. Die Überwachungskameras zeigen: Niemand hat das Anwesen verlassen oder betreten. Der Mörder ist einer der Bewohner - und er ist noch immer im Haus!
 
-Ein grausamer Mord erschüttert die abgelegene Villa, in der du dich nun wiederfindest. Der Täter? Noch immer im Haus. Deine Aufgabe? Den Fall aufklären, bevor du selbst zum nächsten Opfer wirst.
+## Spielstart
 
-## Features
-- **Entscheidungen mit Konsequenzen** – Jeder deiner Schritte kann dein letzter sein.
-- **Mehrere Enden** – Überlebst du oder wird dein Name in Vergessenheit geraten?
-- **Spannende Ermittlungen** – Durchsuche die Villa, verhöre Verdächtige und setze die Puzzleteile zusammen.
-- **Gefährliche Begegnungen** – Traue niemandem. Der Mörder könnte näher sein, als du denkst.
+### Spiel starten
+1. **Hauptdatei laden:**
+   ```prolog
+   ?- consult('main.pl').
+   ```
+3. **Spiel starten:**
+   ```prolog
+   ?- start.
+   ```
 
+### Spielbefehle
+- `look.` - Umgebung betrachten
+- `n.` `s.` `e.` `w.` - Bewegung (Norden, Süden, Osten, Westen)
+- `unten.` `oben.` - Treppen benutzen
+- `interrogate('Name').` - Verdächtige verhören
+- `examine('Objekt').` - Gegenstände untersuchen
+- `take('Objekt').` - Gegenstände aufnehmen
+- `inventory.` - Inventar anzeigen
+- `clues.` - Gesammelte Hinweise anzeigen
+- `accuse('Name').` - Jemanden des Mordes beschuldigen
+- `hint.` - Hilfestellung erhalten
+- `halt.` - Spiel beenden
 
-## Spieler/Personen:
-- Travis (Detektiv / Spieler)
-- Oma Gerti (84 Jahre, sitzt meist vorm Fernseher)
-- Onkel Olaf (Hausherr, Sohn von Oma Gerti, kümmert sich um das Haus und seine Bewohner)
-- Kayla (10 Jahre, weiblich)
-- Hauskoch Josef (kocht für die Bewohner der Villa)
-- Opa Heinrich (gestorben durch Messerstiche mit Messer aus der Küche)
+**Wichtig:** Alle Namen und Objekte müssen in Anführungszeichen stehen!
 
+## Die Villa und ihre Bewohner
 
-## Überlebe die Nacht...
-Du bist Detektiv Travis. Dein Instinkt sagt dir, dass hier etwas nicht stimmt. Jedes Geräusch, jeder Schatten könnte dein Ende bedeuten. Wirst du das Rätsel lösen – oder wird der Mörder dich zum Schweigen bringen?
+### Orte
+- **Eingangshalle** - Tatort (Startpunkt)
+- **Wohnzimmer** - Gemütlicher Aufenthaltsraum
+- **Küche** - Hier fehlt ein Messer...
+- **Bibliothek** - Voller Geheimnisse und Dokumente
+- **Schlafzimmer** - Des Barons private Räume
+- **Keller** - Dunkle Geheimnisse
+- **Garten** - Verdächtige Spuren
+- **Garage** - Versteckte Beweise
 
-Du bekommst einen anonymen Anruf mit verzerrter Stimme, eine Leiche wurde in der Villa gefunden. Laut den Überwachungskameras rund ums Haus hat keiner die Villa verlassen und keine Person hat sie betreten. Der Tote wurde also von einem Bewohner der Villa mit einem Küchenmesser ermordet. Du verhöhrst jeden einzelnen Bewohner und machst dir dein eigenes Bild. Begib dich aber nicht in gefährliche Situationen, denn jeder könnte der Mörder sein!
-Viel Glück, Detective. Du wirst es brauchen.
+### Verdächtige Personen
+- **Oma Gerti** - Die nervöse Großmutter (Wohnzimmer)
+- **Onkel Olaf** - Der verdächtig saubere Gärtner (Garten)
+- **Kayla** - Die trauernde Verlobte (Schlafzimmer)
+- **Hauskoch Josef** - Der schwitzende Koch (Küche)
+- **Dr. Weber** - Der Hausarzt mit Geheimnissen (Bibliothek)
+- **Anwalt Mueller** - Der geheimnisvolle Jurist (Garage)
+
+## Spielziel
+
+**Finde den wahren Mörder von Baron von Steinfeld!**
+
+Sammle Hinweise, verhöre alle Verdächtigen und untersuche verdächtige Gegenstände. Aber Vorsicht: Beschuldigst du die falsche Person, verlierst du das Spiel! Nur mit allen wichtigen Beweisen kannst du den Fall lösen.
+
+### Spieltipps
+- Besuche alle Räume und untersuche alle Gegenstände
+- Verhöre jeden Verdächtigen mindestens einmal
+- Nutze `clues.` um deine gesammelten Hinweise zu überprüfen
+- Der `hint.` Befehl hilft, wenn du nicht weiterkommst
+- Achte besonders auf Widersprüche in den Aussagen
+
+**Viel Glück, Detective.**
 
 
 **Team**
