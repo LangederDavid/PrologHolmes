@@ -44,11 +44,13 @@ show_help :-
     write('*** VERFUEGBARE BEFEHLE ***'), nl,
     write('start.              -- Spiel starten'), nl,
     write('look.               -- Umgebung ansehen'), nl,
+    write('ways.               -- Moegliche Richtungen anzeigen'), nl,
     write('n. s. e. w.         -- Nach Norden, Sueden, Osten, Westen gehen'), nl,
-    write('unten. oben.        -- Nach unten/oben gehen'), nl,
+    write('u. d.               -- Nach oben/unten gehen (Treppen/Keller)'), nl,
     write('interrogate(Name).  -- Eine Person verhoeren'), nl,
     write('examine(Objekt).    -- Einen Gegenstand untersuchen'), nl,
     write('take(Objekt).       -- Einen Gegenstand aufnehmen'), nl,
+    write('use(Objekt).        -- Einen Gegenstand verwenden'), nl,
     write('inventory.          -- Inventar anzeigen'), nl,
     write('clues.              -- Gefundene Hinweise anzeigen'), nl,
     write('accuse(Name).       -- Jemanden des Mordes beschuldigen'), nl,
@@ -61,8 +63,8 @@ n :- move('Norden').
 s :- move('Sueden').
 e :- move('Osten').
 w :- move('Westen').
-unten :- move('Unten').
-oben :- move('Oben').
+u :- move('Oben').
+d :- move('Unten').
 
 move(Direction) :-
     game_over,
@@ -94,12 +96,11 @@ look :-
         print_list(Suspects)
     ; true ),
     
-    % Zeige Gegenstaende
-    findall(I, item_location(I, Location), Items),
+    % Zeige Gegenstaende    findall(I, item_location(I, Location), Items),
     ( Items \= [] ->
         write('GEGENSTAENDE HIER: '),
         print_list(Items)
-    ; true ).
+    ; true ), !.
 
 print_list([]).
 print_list([H]) :- 
@@ -130,7 +131,7 @@ inventory :-
     ; 
         write('DU TRAEGST: '),
         print_list(Items)
-    ).
+    ), !.
 
 % === HINWEISE SYSTEM ===
 
@@ -212,3 +213,63 @@ hint :-
     ; 
         write('TIPP: Du hast genug Hinweise! Wer wurde vom Testament gestrichen?')
     ), nl.
+
+% === RICHTUNGEN ANZEIGEN ===
+ways :-
+    player(travis, Location),
+    write('Moegliche Richtungen von '), write(Location), write(':'), nl,
+    findall([Direction, Destination], path(Location, Direction, Destination), Paths),
+    (Paths = [] ->
+        write('Keine Ausgaenge verfuegbar.'), nl
+    ;
+        show_paths(Paths)
+    ).
+
+show_paths([]).
+show_paths([[Direction, Destination]|Rest]) :-
+    format("  ~w -> ~w~n", [Direction, Destination]),
+    show_paths(Rest).
+
+% === GEGENSTAENDE VERWENDEN ===
+use(Item) :-
+    inventory(Item),
+    player(travis, Location),
+    use_item(Item, Location),
+    !.
+use(Item) :-
+    inventory(Item),
+    write('Du kannst '), write(Item), write(' hier nicht verwenden.'), nl,
+    !.
+use(_) :-
+    write('Du hast diesen Gegenstand nicht im Inventar.'), nl.
+
+% === SPEZIELLE VERWENDUNGEN ===
+use_item('Fernrohr', 'Garten') :-
+    \+ clue_found(fernrohr_beobachtung),
+    assertz(clue_found(fernrohr_beobachtung)),
+    write('Du richtest das Fernrohr auf die Garage...'), nl,
+    write('SCHOCKIEREND: Du siehst frische Reifenspuren! Jemand war heute Nacht unterwegs!'), nl,
+    write('WICHTIGER HINWEIS: Die Spuren fuehren zur Garage - wer hat das Auto benutzt?'), nl,
+    !.
+
+use_item('Fernrohr', Location) :-
+    format('Das Fernrohr ist hier in ~w nicht besonders nuetzlich. Versuche es im Garten.~n', [Location]).
+
+use_item('Schluessel', 'Keller') :-
+    \+ clue_found(truhe_geoeffnet),
+    assertz(clue_found(truhe_geoeffnet)),
+    write('Du verwendest den Schluessel an einer alten Truhe...'), nl,
+    write('KLICK! Die Truhe oeffnet sich!'), nl,
+    write('SCHOCKIERENDER FUND: Gestohlener Schmuck und eine blutige Bluse!'), nl,
+    write('WICHTIGER HINWEIS: Die Bluse gehoert einer Frau - und sie riecht nach Kaylas Parfuem!'), nl,
+    assertz(clue_found(kayla_beweis)),
+    !.
+
+use_item('Schluessel', Location) :-
+    format('Der Schluessel passt hier in ~w nicht. Versuche es im Keller.~n', [Location]).
+
+use_item('Giftflasche', _) :-
+    write('Das Gift ist zu gefaehrlich zum Experimentieren!'), nl.
+
+use_item(Item, _) :-
+    format('Du weisst nicht, wie du ~w verwenden sollst.~n', [Item]).

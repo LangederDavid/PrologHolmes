@@ -9,6 +9,8 @@ location('Schlafzimmer', 'Das Schlafzimmer des Barons. Alles ist ordentlich, bis
 location('Keller', 'Ein dunkler, feuchter Keller mit Weinregalen und alten Truhen.').
 location('Garten', 'Der Garten ist gepflegt, aber eine Schaufel liegt achtlos herum.').
 location('Garage', 'Eine alte Garage mit Werkzeugen und einem alten Auto.').
+location('Dachboden', 'Ein staubiger Dachboden voller alter Moebel und Erinnerungen.').
+location('Geheimkammer', 'Eine versteckte Kammer hinter einem Buecherregal. Was wurde hier versteckt?').
 
 % === WEGE ===
 path('Eingangshalle', 'Norden', 'Wohnzimmer').
@@ -25,3 +27,7 @@ path('Eingangshalle', 'Sueden', 'Garten').
 path('Garten', 'Norden', 'Eingangshalle').
 path('Garten', 'Osten', 'Garage').
 path('Garage', 'Westen', 'Garten').
+path('Schlafzimmer', 'Oben', 'Dachboden').
+path('Dachboden', 'Unten', 'Schlafzimmer').
+path('Bibliothek', 'Unten', 'Geheimkammer').
+path('Geheimkammer', 'Oben', 'Bibliothek').
