@@ -96,11 +96,13 @@ look :-
         print_list(Suspects)
     ; true ),
     
-    % Zeige Gegenstaende    findall(I, item_location(I, Location), Items),
+    % Zeige Gegenstaende
+    findall(I, item_location(I, Location), Items),
     ( Items \= [] ->
         write('GEGENSTAENDE HIER: '),
         print_list(Items)
-    ; true ), !.
+    ; true ),
+    !.
 
 print_list([]).
 print_list([H]) :- 
